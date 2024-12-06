@@ -9,3 +9,4 @@ app.listen(port, () => {
 });
 
 routes(app);
+module.exports = app;
