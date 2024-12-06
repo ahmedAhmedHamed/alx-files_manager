@@ -1,6 +1,7 @@
 import db from '../utils/db';
 import redisDB from '../utils/redis';
 import { v4 as uuidv4 } from 'uuid';
+import queries from '../utils/queries';
 module.exports = (app) => {
   app.get('/connect', async (req, res) => {
     const authheader = req.headers.authorization;
@@ -31,4 +32,14 @@ module.exports = (app) => {
       {'token': sessionToken}
     );
   });
+
+  app.get('/disconnect', async (req, res) => {
+    const authHeader = req.get('X-Token');
+    const user = await queries.getUserFromHeader(authHeader);
+    if (!user) {
+      return res.status(401).json({'error': 'Unauthorized'});
+    }
+    await redisDB.del('auth_' + authHeader);
+    return res.status(204).send();
+  })
 }

@@ -1,4 +1,5 @@
 import db from '../utils/db';
+import queries from "../utils/queries";
 module.exports = (app) => {
   app.post('/users', async (req, res) => {
     const body = req.body;
@@ -14,5 +15,13 @@ module.exports = (app) => {
         'error': error
       });
     });
+  });
+  app.get('/users/me', async (req, res) => {
+    const authHeader = req.get('X-Token');
+    const user = await queries.getUserFromHeader(authHeader);
+    if (!user) {
+      return res.status(401).json({'error': 'Unauthorized'});
+    }
+    res.status(200).json({'email': user.email, 'id': user.id});
   });
 }

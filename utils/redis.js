@@ -25,7 +25,7 @@ class RedisClient {
 
   async set(key, value, duration) {
     const setAsync = util.promisify(this.client.set).bind(this.client);
-    const ret = setAsync(key, value, 'EX', 10);
+    const ret = setAsync(key, value, 'EX', duration);
     ret.catch(console.error);
     return ret;
   }
