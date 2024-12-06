@@ -1,10 +1,6 @@
 const MongoClient = require('mongodb').MongoClient;
 import crypto from 'crypto';
 
-const hashString = (input) => {
-    return crypto.createHash('sha1').update(input).digest('hex');
-};
-
 class DBClient {
   constructor() {
     const host = process.env.DB_HOST || 'localhost';
@@ -21,6 +17,10 @@ class DBClient {
         this.isConnected = true;
       }
     });
+  }
+
+  hashString(input) {
+    return crypto.createHash('sha1').update(input).digest('hex');
   }
 
   isAlive() {
@@ -42,6 +42,16 @@ class DBClient {
     return usersCollection.findOne({ email });
   }
 
+  async getUserFull(email, password) {
+    const usersCollection = this.db.collection('users');
+    const hashedPassword = this.hashString(password);
+    try {
+      return usersCollection.findOne({ email, password: hashedPassword });
+    } catch (err) {
+      return false
+    }
+  }
+
   createUser(email, password) {
     return new Promise(async (resolve, reject) => {
       if (!email) { reject('Missing email'); }
@@ -50,7 +60,7 @@ class DBClient {
       if (user) { reject('Already exist'); }
       const id = await this.db.collection('users').insertOne({
         email,
-        password: hashString(password)
+        password: this.hashString(password)
       });
       resolve(id.insertedId);
     });
