@@ -39,7 +39,7 @@ module.exports = (app) => {
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-    await redisDB.del(`auth_ + ${authHeader}`);
+    await redisDB.del(`auth_${authHeader}`);
     return res.status(204).send();
   });
 };
