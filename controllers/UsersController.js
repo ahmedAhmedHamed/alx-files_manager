@@ -21,6 +21,6 @@ module.exports = (app) => {
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-    return res.status(200).json({ email: user.email, id: user.id });
+    return res.status(200).json({ email: user.email, id: user._id });
   });
 };
