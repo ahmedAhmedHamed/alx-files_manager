@@ -56,15 +56,26 @@ class DBClient {
 
   createUser(email, password) {
     return new Promise((resolve, reject) => {
-      if (!email) { reject(new Error('Missing email')); }
-      if (!password) { reject(new Error('Missing password')); }
+      if (!email) {
+        reject(new Error('Missing email'));
+        return null;
+      }
+      if (!password) {
+        reject(new Error('Missing password'));
+        return null;
+      }
       this.getUser(email).then((user) => {
-        if (user) { reject(new Error('Already exist')); }
+        if (user) {
+          reject(new Error('Already exist'));
+          return null;
+        }
         this.db.collection('users').insertOne({
           email,
           password: DBClient.hashString(password),
         }).then((id) => { resolve(id.insertedId); });
+        return null;
       });
+      return null;
     });
   }
 }

@@ -16,10 +16,8 @@ async function notBusyWaiting() {
     dbClient.createUser('sks', '1234').then(res => {
       console.log('res: ', res);
     }).catch((err) => {
-      console.log('err: ', err);
+      console.log('err: ', err.message);
     });
-    console.log(await dbClient.nbUsers());
-
 })();
 
 /**
