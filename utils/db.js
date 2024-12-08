@@ -1,4 +1,4 @@
-const MongoClient = require('mongodb').MongoClient;
+import { MongoClient } from 'mongodb';
 import crypto from 'crypto';
 
 class DBClient {
@@ -6,20 +6,22 @@ class DBClient {
     const host = process.env.DB_HOST || 'localhost';
     const port = process.env.DB_PORT || 27017;
     const database = process.env.DB_DATABASE || 'files_manager';
-    const url = `'mongodb://${host}:${port}'`
+    const url = `'mongodb://${host}:${port}'`;
     this.client = new MongoClient(url);
     this.isConnected = false;
     this.client.connect((err) => {
-      if (err !== null) return this.isConnected = false;
-      else {
-        console.log("Connected successfully to server");
-        this.db = this.client.db(database);
-        this.isConnected = true;
+      if (err !== null) {
+        this.isConnected = false;
+        return null;
       }
+      console.log('Connected successfully to server');
+      this.db = this.client.db(database);
+      this.isConnected = true;
+      return null;
     });
   }
 
-  hashString(input) {
+  static hashString(input) {
     return crypto.createHash('sha1').update(input).digest('hex');
   }
 
@@ -48,21 +50,21 @@ class DBClient {
     try {
       return usersCollection.findOne({ email, password: hashedPassword });
     } catch (err) {
-      return false
+      return false;
     }
   }
 
   createUser(email, password) {
-    return new Promise(async (resolve, reject) => {
-      if (!email) { reject('Missing email'); }
-      if (!password) { reject('Missing password'); }
-      const user = await this.getUser(email);
-      if (user) { reject('Already exist'); }
-      const id = await this.db.collection('users').insertOne({
-        email,
-        password: this.hashString(password)
+    return new Promise((resolve, reject) => {
+      if (!email) { reject(new Error('Missing email')); }
+      if (!password) { reject(new Error('Missing password')); }
+      this.getUser(email).then((user) => {
+        if (user) { reject(new Error('Already exist')); }
+        this.db.collection('users').insertOne({
+          email,
+          password: DBClient.hashString(password),
+        }).then((id) => { resolve(id.insertedId); });
       });
-      resolve(id.insertedId);
     });
   }
 }
