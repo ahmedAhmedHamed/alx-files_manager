@@ -15,15 +15,15 @@ module.exports = (app) => {
       });
     });
   });
-  app.get('/users/me', async (req, res) => {
-    const authHeader = req.get('X-Token');
-    const user = await queries.getUserFromHeader(authHeader);
-    if (!user) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-    const ret = { id: user._id, ...user };
-    delete ret._id;
-    delete ret.password;
-    return res.status(200).json(ret);
-  });
+  // app.get('/users/me', async (req, res) => {
+  //   const authHeader = req.get('X-Token');
+  //   const user = await queries.getUserFromHeader(authHeader);
+  //   if (!user) {
+  //     return res.status(401).json({ error: 'Unauthorized' });
+  //   }
+  //   const ret = { id: user._id, ...user };
+  //   delete ret._id;
+  //   delete ret.password;
+  //   return res.status(200).json(ret);
+  // });
 };
