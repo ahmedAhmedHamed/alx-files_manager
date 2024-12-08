@@ -17,6 +17,8 @@ class DBClient {
       console.log('Connected successfully to server');
       this.db = this.client.db(database);
       this.isConnected = true;
+      this.usersCollection = this.db.collection('users');
+      this.filesCollection = this.db.collection('files');
       return null;
     });
   }
@@ -30,25 +32,21 @@ class DBClient {
   }
 
   async nbUsers() {
-    const usersCollection = this.db.collection('users');
-    return usersCollection.countDocuments();
+    return this.usersCollection.countDocuments();
   }
 
   async nbFiles() {
-    const filesCollection = this.db.collection('files');
-    return filesCollection.countDocuments();
+    return this.filesCollection.countDocuments();
   }
 
   async getUser(email) {
-    const usersCollection = this.db.collection('users');
-    return usersCollection.findOne({ email });
+    return this.usersCollection.findOne({ email });
   }
 
   async getUserFull(email, password) {
-    const usersCollection = this.db.collection('users');
     const hashedPassword = DBClient.hashString(password);
     try {
-      return usersCollection.findOne({ email, password: hashedPassword });
+      return this.usersCollection.findOne({ email, password: hashedPassword });
     } catch (err) {
       return false;
     }
