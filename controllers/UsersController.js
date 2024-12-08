@@ -21,6 +21,9 @@ module.exports = (app) => {
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-    return res.status(200).json({ id: user._id, ...user });
+    const ret = { id: user._id, ...user };
+    delete ret._id;
+    delete ret.password;
+    return res.status(200).json(ret);
   });
 };
