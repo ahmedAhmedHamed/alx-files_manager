@@ -1,12 +1,11 @@
 import { createClient } from 'redis';
-import util from "util";
-
+import util from 'util';
 
 class RedisClient {
   constructor() {
     this.client = createClient();
     this.isConnected = true;
-    this.client.on('error', (error)=> {
+    this.client.on('error', (error) => {
       this.isConnected = false;
       console.log(error);
     });
@@ -40,4 +39,3 @@ class RedisClient {
 
 const redisClient = new RedisClient();
 module.exports = redisClient;
-
