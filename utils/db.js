@@ -46,7 +46,7 @@ class DBClient {
 
   async getUserFull(email, password) {
     const usersCollection = this.db.collection('users');
-    const hashedPassword = this.hashString(password);
+    const hashedPassword = DBClient.hashString(password);
     try {
       return usersCollection.findOne({ email, password: hashedPassword });
     } catch (err) {
