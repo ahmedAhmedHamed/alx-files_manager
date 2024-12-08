@@ -27,7 +27,7 @@ module.exports = (app) => {
     }
 
     const sessionToken = uuidv4();
-    await redisDB.set(`auth_ + ${sessionToken}`, email, 24 * 60 * 60);
+    await redisDB.set(`auth_${sessionToken}`, email, 24 * 60 * 60);
     return res.status(200).json(
       { token: sessionToken },
     );

@@ -8,7 +8,7 @@ class Queries {
     if (!authHeader) {
       return false;
     }
-    const userEmail = await redisDB.get('auth_' + authHeader);
+    const userEmail = await redisDB.get(`auth_${authHeader}`);
     if (!userEmail) {
       return false;
     }
