@@ -1,5 +1,4 @@
-import db from '../utils/db';
-import redisDB from '../utils/redis';
+import fileUtils from '../utils/file';
 import queries from "../utils/queries";
 module.exports = (app) => {
   const allowedTypes = ['folder', 'file', 'image'];
@@ -23,6 +22,15 @@ module.exports = (app) => {
     }
     if (!data && type !== 'folder') {
       return res.status(400).json({'error': 'Missing data'});
+    }
+
+    if (type === 'folder') {
+      fileUtils.addFolder(user._id.toString(), filename, parentId, isPublic).then((result) => {
+        const ret = { ...result.ops[0] };
+        ret.id = ret._id.toString();
+        delete ret._id;
+        res.status(201).json(ret)
+      });
     }
 
   });
