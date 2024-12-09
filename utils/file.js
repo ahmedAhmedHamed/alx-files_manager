@@ -61,6 +61,22 @@ class FileUtils {
       return false;
     }
   }
+
+  findAndUpdateOne(filter, update) {
+    try {
+      return db.filesCollection.findOneAndUpdate(filter, update,
+        {returnNewDocument: true});
+    } catch (err) {
+      return false;
+    }
+  }
+
+  formatFile(file) {
+    const ret = {id: file._id.toString(), ...file};
+    delete ret.file;
+    delete ret.localPath;
+    return ret;
+  }
 }
 
 module.exports = new FileUtils;

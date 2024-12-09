@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import fileUtils from '../utils/file';
 import queries from '../utils/queries';
+import {ObjectId} from 'mongodb';
 
 module.exports = (app) => {
   const allowedTypes = ['folder', 'file', 'image'];
@@ -60,16 +61,12 @@ module.exports = (app) => {
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-    const document = await fileUtils
+    const file = await fileUtils
       .getFileFromIdAndUserId(fileId, user._id.toString());
-    if (!document) {
+    if (!file) {
       return res.status(404).json({ error: 'Not found' });
     }
-    const ret = { id: document._id, ...document };
-    delete ret._id;
-    delete ret.localPath;
-    ret.parentId = ret.parentId === '0' ? 0 : ret.parentId.toString();
-    return res.status(200).json(ret);
+    return res.status(200).json(fileUtils.formatFile(file));
   });
 
   app.get('/files', async (req, res) => {
@@ -91,12 +88,26 @@ module.exports = (app) => {
       .getAllFilesFromParentIdPaginated(parentId, page);
     fileList = await fileList.toArray();
     const ret = fileList[0].data.map((file) => {
-      const ret = { ...file };
-      ret.id = ret._id.toString();
-      delete ret._id;
-      delete ret.localPath;
-      return ret;
+      return fileUtils.formatFile(file);
     }) || [];
     return res.status(200).json(ret);
+  });
+
+  app.put('/files/:id/publish', async (req, res) => {
+    const fileId = req.params.id;
+    const authHeader = req.get('X-Token');
+        const user = await queries.getUserFromHeader(authHeader);
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const filter = { _id: ObjectId(fileId) }; // Condition to find the document
+    const update = { $set: { isPublic: true } }; // Update operation
+
+    const file = await fileUtils.findAndUpdateOne(filter, update);
+    if (!file) {
+      return res.status(404).json({ error: 'Not found' });
+    }
+    return res.status(200).json(fileUtils.formatFile(file));
+
   });
 };
