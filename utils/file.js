@@ -74,6 +74,7 @@ class FileUtils {
   formatFile(file) {
     const ret = {id: file._id.toString(), ...file};
     delete ret.file;
+    delete ret._id;
     delete ret.localPath;
     return ret;
   }
