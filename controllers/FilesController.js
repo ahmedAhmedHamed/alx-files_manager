@@ -1,27 +1,27 @@
 import { v4 as uuidv4 } from 'uuid';
+import { ObjectId } from 'mongodb';
 import fileUtils from '../utils/file';
 import queries from '../utils/queries';
-import {ObjectId} from 'mongodb';
 
 async function setIsPublicFile(req, res, pub) {
   const fileId = req.params.id;
-    const authHeader = req.get('X-Token');
-        const user = await queries.getUserFromHeader(authHeader);
-    if (!user) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-    let file = false;
-    try {
-      const filter = { _id: ObjectId(fileId) }; // Condition to find the document
-      const update = { $set: { isPublic: pub } }; // Update operation
-      file = await fileUtils.findAndUpdateOne(filter, update);
-    } catch (e) {
-      return res.status(404).json({ error: 'Not found' });
-    }
-    if (!file) {
-      return res.status(404).json({ error: 'Not found' });
-    }
-    return res.status(200).json(fileUtils.formatFile(file.value));
+  const authHeader = req.get('X-Token');
+  const user = await queries.getUserFromHeader(authHeader);
+  if (!user) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  let file = false;
+  try {
+    const filter = { _id: ObjectId(fileId) }; // Condition to find the document
+    const update = { $set: { isPublic: pub } }; // Update operation
+    file = await fileUtils.findAndUpdateOne(filter, update);
+  } catch (e) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+  if (!file) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+  return res.status(200).json(fileUtils.formatFile(file.value));
 }
 
 module.exports = (app) => {
@@ -108,17 +108,11 @@ module.exports = (app) => {
     let fileList = await fileUtils
       .getAllFilesFromParentIdPaginated(parentId, page);
     fileList = await fileList.toArray();
-    const ret = fileList[0].data.map((file) => {
-      return fileUtils.formatFile(file);
-    }) || [];
+    const ret = fileList[0].data.map((file) => fileUtils.formatFile(file)) || [];
     return res.status(200).json(ret);
   });
 
-  app.put('/files/:id/publish', async (req, res) => {
-    return setIsPublicFile(req, res, true);
-  });
+  app.put('/files/:id/publish', async (req, res) => setIsPublicFile(req, res, true));
 
-  app.put('/files/:id/unpublish', async (req, res) => {
-    return setIsPublicFile(req, res, false);
-  });
+  app.put('/files/:id/unpublish', async (req, res) => setIsPublicFile(req, res, false));
 };
