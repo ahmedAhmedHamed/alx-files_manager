@@ -10,14 +10,18 @@ async function setIsPublicFile(req, res, pub) {
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-    const filter = { _id: ObjectId(fileId) }; // Condition to find the document
-    const update = { $set: { isPublic: pub } }; // Update operation
-
-    const file = await fileUtils.findAndUpdateOne(filter, update);
+    let file = false;
+    try {
+      const filter = { _id: ObjectId(fileId) }; // Condition to find the document
+      const update = { $set: { isPublic: pub } }; // Update operation
+      file = await fileUtils.findAndUpdateOne(filter, update);
+    } catch (e) {
+      return res.status(404).json({ error: 'Not found' });
+    }
     if (!file) {
       return res.status(404).json({ error: 'Not found' });
     }
-    return res.status(200).json(fileUtils.formatFile(file));
+    return res.status(200).json(fileUtils.formatFile(file.value));
 }
 
 module.exports = (app) => {
