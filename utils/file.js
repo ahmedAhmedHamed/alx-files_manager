@@ -65,7 +65,7 @@ class FileUtils {
   findAndUpdateOne(filter, update) {
     try {
       return db.filesCollection.findOneAndUpdate(filter, update,
-        {returnNewDocument: true});
+        {returnDocument: 'after'});
     } catch (err) {
       return false;
     }
