@@ -67,6 +67,7 @@ module.exports = (app) => {
     const ret = { ...document };
     ret.id = ret._id.toString();
     delete ret._id;
+    delete ret.localPath;
     return res.status(200).json(document);
   });
 
