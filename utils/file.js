@@ -81,6 +81,17 @@ class FileUtils {
       parentId: file.parentId,
     };
   }
+
+  async getFile(query) {
+    return await db.filesCollection.findOne(query);
+  }
+
+  processFile(doc) {
+    const file = { id: doc._id, ...doc };
+    delete file.localPath;
+    delete file._id;
+    return file;
+  }
 }
 
 module.exports = new FileUtils;

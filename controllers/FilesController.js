@@ -3,6 +3,15 @@ import { ObjectId } from 'mongodb';
 import fileUtils from '../utils/file';
 import queries from '../utils/queries';
 
+function isValidId(id) {
+  try {
+    ObjectId(id);
+  } catch (err) {
+    return false;
+  }
+  return true;
+}
+
 async function setIsPublicFile(req, res, pub) {
   const fileId = req.params.id;
   const authHeader = req.get('X-Token');
@@ -76,18 +85,19 @@ module.exports = (app) => {
   });
 
   app.get('/files/:id', async (req, res) => {
-    const fileId = req.params.id;
     const authHeader = req.get('X-Token');
+    const fileId = req.params.id;
     const user = await queries.getUserFromHeader(authHeader);
-    if (!user) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-    const file = await fileUtils
-      .getFileFromIdAndUserId(fileId, user._id.toString());
-    if (!file) {
-      return res.status(404).json({ error: 'Not found' });
-    }
-    return res.json(fileUtils.formatFile(file));
+    const userId = user._id.toString();
+    if (!user) return res.status(401).send({ error: 'Unauthorized' });
+    if (!isValidId(fileId) || !isValidId(userId)) { return res.status(404).send({ error: 'Not found' }); }
+    const result = await fileUtils.getFile({
+      _id: ObjectId(fileId),
+      userId: ObjectId(userId),
+    });
+    if (!result) return res.status(404).send({ error: 'Not found' });
+    const file = fileUtils.processFile(result);
+    return res.status(200).send(file);
   });
 
   app.get('/files', async (req, res) => {
