@@ -68,7 +68,8 @@ module.exports = (app) => {
     const ret = { id: document._id, ...document };
     delete ret._id;
     delete ret.localPath;
-    return res.status(200).send(ret);
+    ret.parentId = ret.parentId === '0' ? 0 : ret.parentId.toString();
+    return res.status(200).json(ret);
   });
 
   app.get('/files', async (req, res) => {
