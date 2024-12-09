@@ -108,6 +108,22 @@ module.exports = (app) => {
       return res.status(404).json({ error: 'Not found' });
     }
     return res.status(200).json(fileUtils.formatFile(file));
+  });
 
+  app.put('/files/:id/unpublish', async (req, res) => {
+    const fileId = req.params.id;
+    const authHeader = req.get('X-Token');
+        const user = await queries.getUserFromHeader(authHeader);
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const filter = { _id: ObjectId(fileId) }; // Condition to find the document
+    const update = { $set: { isPublic: false } }; // Update operation
+
+    const file = await fileUtils.findAndUpdateOne(filter, update);
+    if (!file) {
+      return res.status(404).json({ error: 'Not found' });
+    }
+    return res.status(200).json(fileUtils.formatFile(file));
   });
 };
