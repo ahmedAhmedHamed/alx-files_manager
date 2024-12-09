@@ -69,4 +69,25 @@ module.exports = (app) => {
     return res.status(200).json(document);
   });
 
+  app.get('/files', async (req, res) => {
+    const authHeader = req.get('X-Token');
+    const parentId = req.query.parentId || 0;
+    const page = req.query.page || 0;
+    const user = await queries.getUserFromHeader(authHeader);
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    let fileList = await fileUtils
+      .getAllFilesFromParentIdPaginated(parentId, page);
+    fileList = await fileList.toArray();
+    const ret = fileList[0]?.data.map((file) => {
+      const ret = { ...file };
+      ret.id = ret._id.toString();
+      delete ret._id;
+      delete ret.localPath;
+      return ret;
+    }) || [];
+    return res.status(200).json(ret);
+  });
+
 };

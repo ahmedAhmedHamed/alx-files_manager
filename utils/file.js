@@ -32,6 +32,25 @@ class FileUtils {
       return false;
     }
   }
+
+  getAllFilesFromParentIdPaginated(parentId, page) {
+    try {
+      return db.filesCollection.aggregate([
+        {
+          $match: {
+            parentId
+          }
+        },
+        {
+          $facet: {
+            data: [{ $skip: (page) * 20 }, { $limit: 20 }],
+          },
+        },
+      ]);
+    } catch (err) {
+      return false;
+    }
+  }
 }
 
 module.exports = new FileUtils;
