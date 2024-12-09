@@ -35,11 +35,13 @@ class FileUtils {
 
   getAllFilesFromParentIdPaginated(parentId, page) {
     try {
+      let query = {};
+      if (parentId !== 0) {
+        query = { parentId };
+      }
       return db.filesCollection.aggregate([
         {
-          $match: {
-            parentId
-          }
+          $match: query
         },
         {
           $facet: {

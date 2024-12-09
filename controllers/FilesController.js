@@ -61,7 +61,7 @@ module.exports = (app) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
     const document = await fileUtils.getFileFromId(fileId);
-    if (!document || document.userId !== user._id) {
+    if (!document || document.userId !== user._id.toString()) {
       return res.status(404).json({ error: 'Not found' });
     }
     const ret = { ...document };
