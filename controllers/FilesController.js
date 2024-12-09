@@ -73,7 +73,8 @@ module.exports = (app) => {
   app.get('/files', async (req, res) => {
     const authHeader = req.get('X-Token');
     const parentId = req.query.parentId || 0;
-    const page = req.query.page || 0;
+    let page = Number(req.query.page) || 0;
+    if (Number.isNaN(page)) page = 0;
     const user = await queries.getUserFromHeader(authHeader);
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' });
