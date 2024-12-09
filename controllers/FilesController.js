@@ -87,7 +87,7 @@ module.exports = (app) => {
     if (!file) {
       return res.status(404).json({ error: 'Not found' });
     }
-    return res.status(200).json(fileUtils.formatFile(file));
+    return res.json(fileUtils.formatFile(file));
   });
 
   app.get('/files', async (req, res) => {
