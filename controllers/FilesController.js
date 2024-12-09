@@ -3,6 +3,23 @@ import fileUtils from '../utils/file';
 import queries from '../utils/queries';
 import {ObjectId} from 'mongodb';
 
+async function setIsPublicFile(req, res, pub) {
+  const fileId = req.params.id;
+    const authHeader = req.get('X-Token');
+        const user = await queries.getUserFromHeader(authHeader);
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const filter = { _id: ObjectId(fileId) }; // Condition to find the document
+    const update = { $set: { isPublic: pub } }; // Update operation
+
+    const file = await fileUtils.findAndUpdateOne(filter, update);
+    if (!file) {
+      return res.status(404).json({ error: 'Not found' });
+    }
+    return res.status(200).json(fileUtils.formatFile(file));
+}
+
 module.exports = (app) => {
   const allowedTypes = ['folder', 'file', 'image'];
   app.post('/files', async (req, res) => {
@@ -94,36 +111,10 @@ module.exports = (app) => {
   });
 
   app.put('/files/:id/publish', async (req, res) => {
-    const fileId = req.params.id;
-    const authHeader = req.get('X-Token');
-        const user = await queries.getUserFromHeader(authHeader);
-    if (!user) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-    const filter = { _id: ObjectId(fileId) }; // Condition to find the document
-    const update = { $set: { isPublic: true } }; // Update operation
-
-    const file = await fileUtils.findAndUpdateOne(filter, update);
-    if (!file) {
-      return res.status(404).json({ error: 'Not found' });
-    }
-    return res.status(200).json(fileUtils.formatFile(file));
+    return setIsPublicFile(req, res, true);
   });
 
   app.put('/files/:id/unpublish', async (req, res) => {
-    const fileId = req.params.id;
-    const authHeader = req.get('X-Token');
-        const user = await queries.getUserFromHeader(authHeader);
-    if (!user) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-    const filter = { _id: ObjectId(fileId) }; // Condition to find the document
-    const update = { $set: { isPublic: false } }; // Update operation
-
-    const file = await fileUtils.findAndUpdateOne(filter, update);
-    if (!file) {
-      return res.status(404).json({ error: 'Not found' });
-    }
-    return res.status(200).json(fileUtils.formatFile(file));
+    return setIsPublicFile(req, res, false);
   });
 };
