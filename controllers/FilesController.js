@@ -88,15 +88,18 @@ module.exports = (app) => {
   app.get('/files/:id', async (req, res) => {
     const fileId = req.params.id;
     const { userId } = await queries.getUserIdAndKey(req);
-    const user = await db.usersCollection.getUser({
+    const user = await db.usersCollection.findOne({
       _id: ObjectId(userId),
     });
     if (!user) return res.status(401).send({ error: 'Unauthorized' });
-    if (!isValidId(fileId) || !isValidId(userId)) { return res.status(404).send({ error: 'Not found' }); }
+    if (!isValidId(fileId) || !isValidId(userId)) {
+      return res.status(404).send({ error: 'Not found' });
+    }
     const result = await fileUtils.getFile({
       _id: ObjectId(fileId),
-      userId: ObjectId(userId),
+      userId: userId,
     });
+    console.log('result: ', result)
     if (!result) return res.status(404).send({ error: 'Not found' });
     const file = fileUtils.processFile(result);
     return res.status(200).send(file);

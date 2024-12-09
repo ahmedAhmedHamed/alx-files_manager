@@ -83,7 +83,7 @@ class FileUtils {
   }
 
   async getFile(query) {
-    return await db.filesCollection.findOne(query);
+    return db.filesCollection.findOne(query);
   }
 
   processFile(doc) {
