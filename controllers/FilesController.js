@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ObjectId } from 'mongodb';
 import fileUtils from '../utils/file';
 import queries from '../utils/queries';
+import db from '../utils/db';
 
 function isValidId(id) {
   try {
@@ -85,10 +86,11 @@ module.exports = (app) => {
   });
 
   app.get('/files/:id', async (req, res) => {
-    const authHeader = req.get('X-Token');
     const fileId = req.params.id;
-    const user = await queries.getUserFromHeader(authHeader);
-    const userId = user._id.toString();
+    const { userId } = await queries.getUserIdAndKey(req);
+    const user = await db.usersCollection.getUser({
+      _id: ObjectId(userId),
+    });
     if (!user) return res.status(401).send({ error: 'Unauthorized' });
     if (!isValidId(fileId) || !isValidId(userId)) { return res.status(404).send({ error: 'Not found' }); }
     const result = await fileUtils.getFile({

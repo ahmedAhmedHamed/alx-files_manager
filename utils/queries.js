@@ -28,6 +28,15 @@ class Queries {
     }
   }
 
+  async getUserIdAndKey(request) {
+    const ret = { userId: null, key: null };
+    const token = request.header('X-Token');
+    if (!token) return ret;
+    ret.key = `auth_${token}`;
+    ret.userId = await redisDB.get(ret.key);
+    return ret;
+  }
+
 }
 
 module.exports = new Queries();
