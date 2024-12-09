@@ -33,6 +33,14 @@ class FileUtils {
     }
   }
 
+  getFileFromIdAndUserId(fileId, userId) {
+    try {
+      return db.filesCollection.findOne({ _id: ObjectId(fileId), userId });
+    } catch (err) {
+      return false;
+    }
+  }
+
   getAllFilesFromParentIdPaginated(parentId, page) {
     try {
       let query = {};

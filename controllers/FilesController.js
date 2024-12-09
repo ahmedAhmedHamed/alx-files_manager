@@ -57,13 +57,14 @@ module.exports = (app) => {
     const fileId = req.params.id;
     const authHeader = req.get('X-Token');
     const user = await queries.getUserFromHeader(authHeader);
-    // if (!user) {
-    //   return res.status(401).json({ error: 'Unauthorized' });
-    // }
-    const document = await fileUtils.getFileFromId(fileId);
-    // if (!document || document.userId !== user._id.toString()) {
-    //   return res.status(404).json({ error: 'Not found' });
-    // }
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const document = await fileUtils
+      .getFileFromIdAndUserId(fileId, user._id.toString());
+    if (!document) {
+      return res.status(404).json({ error: 'Not found' });
+    }
     const ret = { id: document._id, ...document };
     delete ret._id;
     delete ret.localPath;
