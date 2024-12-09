@@ -43,7 +43,7 @@ module.exports = (app) => {
     }
     const filePath = fileUtils.createFile(storingFolder, uuidv4(), data);
     return fileUtils
-      .addFile(user._id.toString(), filename, parentId, isPublic, filePath, type, data)
+      .addFile(user._id.toString(), filename, parentId, isPublic, filePath, type)
       .then((result) => {
         const ret = { ...result.ops[0] };
         ret.id = ret._id.toString();

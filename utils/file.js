@@ -10,9 +10,9 @@ class FileUtils {
     type: 'folder' });
   }
 
-  addFile(userId, name, parentId, isPublic, localPath, type, data) {
+  addFile(userId, name, parentId, isPublic, localPath, type) {
     return db.filesCollection.insertOne({ userId, name, parentId, isPublic,
-    type, localPath, data });
+    type, localPath });
   }
 
   createFile(storingFolder, filename, base64Data) {
