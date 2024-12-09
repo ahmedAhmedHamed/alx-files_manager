@@ -62,9 +62,9 @@ module.exports = (app) => {
     }
     const document = await fileUtils
       .getFileFromIdAndUserId(fileId, user._id.toString());
-    // if (!document) {
-    //   return res.status(404).json({ error: 'Not found' });
-    // }
+    if (!document) {
+      return res.status(404).json({ error: 'Not found' });
+    }
     const ret = { id: document._id, ...document };
     delete ret._id;
     delete ret.localPath;
