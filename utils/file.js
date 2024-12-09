@@ -72,11 +72,14 @@ class FileUtils {
   }
 
   formatFile(file) {
-    const ret = {id: file._id.toString(), ...file};
-    delete ret.file;
-    delete ret._id;
-    delete ret.localPath;
-    return ret;
+    return {
+      id: file._id.toString(),
+      userId: file.userId,
+      name: file.name,
+      type: file.type,
+      isPublic: file.isPublic,
+      parentId: file.parentId,
+    };
   }
 }
 
