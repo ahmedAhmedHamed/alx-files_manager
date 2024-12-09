@@ -77,11 +77,7 @@ module.exports = (app) => {
     return fileUtils
       .addFile(user._id.toString(), filename, parentId, isPublic, filePath, type)
       .then((result) => {
-        const ret = { ...result.ops[0] };
-        ret.id = ret._id.toString();
-        delete ret._id;
-        delete ret.localPath;
-        return res.status(201).json(ret);
+        return res.status(201).json(fileUtils.formatFile(result.ops[0]));
       });
   });
 
@@ -97,7 +93,7 @@ module.exports = (app) => {
     }
     const result = await fileUtils.getFile({
       _id: ObjectId(fileId),
-      userId: userId,
+      userId: ObjectId(userId),
     });
     console.log('result: ', result)
     if (!result) return res.status(404).send({ error: 'Not found' });

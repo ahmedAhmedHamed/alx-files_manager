@@ -1,17 +1,22 @@
 import db from './db';
 import fs from 'fs';
-import {ObjectId} from 'mongodb';
+import { ObjectId } from 'mongodb';
 
 class FileUtils {
   constructor(){}
 
   addFolder(userId, name, parentId, isPublic) {
-    return db.filesCollection.insertOne({ userId, name, parentId, isPublic,
+    if (parentId !== 0) {
+      parentId = ObjectId(parentId);
+    }
+    return db.filesCollection.insertOne({ userId: ObjectId(userId), name,
+      parentId, isPublic,
     type: 'folder' });
   }
 
   addFile(userId, name, parentId, isPublic, localPath, type) {
-    return db.filesCollection.insertOne({ userId, name, parentId, isPublic,
+    return db.filesCollection.insertOne({ userId: ObjectId(userId), name,
+      parentId: ObjectId(parentId), isPublic,
     type, localPath });
   }
 
@@ -35,7 +40,7 @@ class FileUtils {
 
   getFileFromIdAndUserId(fileId, userId) {
     try {
-      return db.filesCollection.findOne({ _id: ObjectId(fileId), userId });
+      return db.filesCollection.findOne({ _id: ObjectId(fileId), userId: ObjectId(userId) });
     } catch (err) {
       return false;
     }
@@ -45,7 +50,7 @@ class FileUtils {
     try {
       let query = {};
       if (parentId !== 0 && parentId !== '0') {
-        query = { parentId };
+        query = { parentId: ObjectId(parentId) };
       }
       return db.filesCollection.aggregate([
         {
@@ -74,11 +79,11 @@ class FileUtils {
   formatFile(file) {
     return {
       id: file._id.toString(),
-      userId: file.userId,
+      userId: file.userId.toString(),
       name: file.name,
       type: file.type,
       isPublic: file.isPublic,
-      parentId: file.parentId,
+      parentId: file.parentId.toString(),
     };
   }
 
@@ -87,7 +92,7 @@ class FileUtils {
   }
 
   processFile(doc) {
-    const file = { id: doc._id, ...doc };
+    const file = { id: doc._id.toString(), ...doc };
     delete file.localPath;
     delete file._id;
     return file;
