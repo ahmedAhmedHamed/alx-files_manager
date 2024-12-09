@@ -55,6 +55,7 @@ module.exports = (app) => {
 
   app.get('/files/:id', async (req, res) => {
     const fileId = req.params.id;
+    const authHeader = req.get('X-Token');
     const user = await queries.getUserFromHeader(authHeader);
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' });
@@ -63,7 +64,7 @@ module.exports = (app) => {
     if (!document || document.userId !== user._id) {
       return res.status(404).json({ error: 'Not found' });
     }
-    const ret = {...document};
+    const ret = { ...document };
     ret.id = ret._id.toString();
     delete ret._id;
     return res.status(200).json(document);
@@ -80,7 +81,7 @@ module.exports = (app) => {
     let fileList = await fileUtils
       .getAllFilesFromParentIdPaginated(parentId, page);
     fileList = await fileList.toArray();
-    const ret = fileList[0]?.data.map((file) => {
+    const ret = fileList[0].data.map((file) => {
       const ret = { ...file };
       ret.id = ret._id.toString();
       delete ret._id;
@@ -89,5 +90,4 @@ module.exports = (app) => {
     }) || [];
     return res.status(200).json(ret);
   });
-
 };
