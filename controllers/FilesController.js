@@ -52,4 +52,21 @@ module.exports = (app) => {
         return res.status(201).json(ret);
       });
   });
+
+  app.get('/files/:id', async (req, res) => {
+    const fileId = req.params.id;
+    const user = await queries.getUserFromHeader(authHeader);
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const document = await fileUtils.getFileFromId(fileId);
+    if (!document || document.userId !== user._id) {
+      return res.status(404).json({ error: 'Not found' });
+    }
+    const ret = {...document};
+    ret.id = ret._id.toString();
+    delete ret._id;
+    return res.status(200).json(document);
+  });
+
 };
