@@ -79,6 +79,10 @@ module.exports = (app) => {
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
+    const folder = fileUtils.getFileFromId(parentId);
+    if (!folder || folder.type !== 'folder') {
+      return res.status(200).send([]);
+    }
     let fileList = await fileUtils
       .getAllFilesFromParentIdPaginated(parentId, page);
     fileList = await fileList.toArray();
