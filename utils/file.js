@@ -73,7 +73,7 @@ class FileUtils {
   findAndUpdateOne(filter, update) {
     try {
       return db.filesCollection.findOneAndUpdate(filter, update,
-        {returnDocument: 'after'});
+        { returnOriginal: false });
     } catch (err) {
       return false;
     }
