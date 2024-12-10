@@ -1,5 +1,7 @@
 import fileQueue from'./utils/fileQueue';
+import userQueue from './utils/userQueue';
 import fileUtils from './utils/file';
+import queries from './utils/queries';
 import imageThumbnail from 'image-thumbnail';
 import fs from 'fs';
 
@@ -27,4 +29,16 @@ fileQueue.process(async (job, done) => {
     return done();
   } catch (e) {}
 
+});
+
+userQueue.process(async (job, done) => {
+  const userId = job.data.userId;
+  if (!userId) {
+    done(new Error('missing userId'));
+  }
+  const user = await queries.getUserFromId(userId);
+  if (!user) {
+    done(new Error('User not found'));
+  }
+  console.log(`Welcome ${user.email}!`)
 });
