@@ -127,6 +127,7 @@ module.exports = (app) => {
   app.put('/files/:id/unpublish', async (req, res) => setIsPublicFile(req, res, false));
   app.get('/files/:id/data', async (req, res) => {
     const fileId = req.params.id;
+    const size = req.params.size;
     const { userId } = await queries.getUserIdAndKey(req);
     const file = await fileUtils.getFileFromId(fileId);
     if (!file) {
@@ -139,8 +140,11 @@ module.exports = (app) => {
       return res.status(400).json({ error: "A folder doesn't have content" });
     }
     const mimeType = mime.lookup(file.name);
-
-    return fs.readFile(file.localPath, (err, data) => {
+    let path = file.localPath;
+    if (size) {
+      path = `${path}_${size}`;
+    }
+    return fs.readFile(path, (err, data) => {
       if (err) {
         return res.status(404).send({ error: 'Not found' });
       }
