@@ -140,12 +140,12 @@ module.exports = (app) => {
     }
     const mimeType = mime.lookup(file.name);
 
-    fs.readFile(file.localPath, (err, data) => {
+    return fs.readFile(file.localPath, (err, data) => {
       if (err) {
         return res.status(404).send({ error: 'Not found' });
       }
-      res.setHeader("content-type", mimeType);
-      res.status(200).send(data);
+      res.setHeader('content-type', mimeType);
+      return res.status(200).send(data);
     });
   });
 };
