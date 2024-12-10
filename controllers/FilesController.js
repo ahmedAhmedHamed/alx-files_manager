@@ -78,7 +78,7 @@ module.exports = (app) => {
     const filePath = fileUtils.createFile(storingFolder, uuidv4(), data);
     return fileUtils
       .addFile(user._id.toString(), filename, parentId, isPublic, filePath, type)
-      .then((result) => res.status(201).json(fileUtils.formatFile(result.ops[0])));
+      .then((file) => res.status(201).json(file));
   });
 
   app.get('/files/:id', async (req, res) => {

@@ -1,6 +1,7 @@
+import { ObjectId } from 'mongodb';
 import db from './db';
 import fs from 'fs';
-import { ObjectId } from 'mongodb';
+import queueUtils from './queueUtils';
 
 class FileUtils {
   constructor(){}
@@ -20,7 +21,13 @@ class FileUtils {
     }
     return db.filesCollection.insertOne({ userId: ObjectId(userId), name,
       parentId, isPublic,
-    type, localPath });
+    type, localPath }).then((result) => {
+        const file = result.ops[0];
+        if (file.type === 'image') {
+          queueUtils.onImageAddition(file._id, file.userId);
+        }
+        return this.formatFile(file);
+      });
   }
 
   createFile(storingFolder, filename, base64Data) {
