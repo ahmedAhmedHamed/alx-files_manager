@@ -1,5 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { ObjectId } from 'mongodb';
+import fs from 'fs';
+import mime from 'mime-types';
 import fileUtils from '../utils/file';
 import queries from '../utils/queries';
 import db from '../utils/db';
@@ -123,7 +125,27 @@ module.exports = (app) => {
   app.put('/files/:id/publish', async (req, res) => setIsPublicFile(req, res, true));
 
   app.put('/files/:id/unpublish', async (req, res) => setIsPublicFile(req, res, false));
-  // app.get('/files/:id/data', async (req, res) => {
-  //
-  // });
+  app.get('/files/:id/data', async (req, res) => {
+    const fileId = req.params.id;
+    const { userId } = await queries.getUserIdAndKey(req);
+    const file = await fileUtils.getFileFromId(fileId);
+    if (!file) {
+      return res.status(404).send({ error: 'Not found' });
+    }
+    if (file.isPublic === false && (file.userId.toString() !== userId)) {
+      return res.status(404).send({ error: 'Not found' });
+    }
+    if (file.type === 'folder') {
+      return res.status(400).json({ error: "A folder doesn't have content" });
+    }
+    const mimeType = mime.lookup(file.name);
+
+    fs.readFile(file.localPath, (err, data) => {
+      if (err) {
+        return res.status(404).send({ error: 'Not found' });
+      }
+      res.setHeader("content-type", mimeType);
+      res.status(200).send(data);
+    });
+  });
 };
