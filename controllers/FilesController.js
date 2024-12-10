@@ -76,9 +76,7 @@ module.exports = (app) => {
     const filePath = fileUtils.createFile(storingFolder, uuidv4(), data);
     return fileUtils
       .addFile(user._id.toString(), filename, parentId, isPublic, filePath, type)
-      .then((result) => {
-        return res.status(201).json(fileUtils.formatFile(result.ops[0]));
-      });
+      .then((result) => res.status(201).json(fileUtils.formatFile(result.ops[0])));
   });
 
   app.get('/files/:id', async (req, res) => {
@@ -95,7 +93,6 @@ module.exports = (app) => {
       _id: ObjectId(fileId),
       userId: ObjectId(userId),
     });
-    console.log('result: ', result)
     if (!result) return res.status(404).send({ error: 'Not found' });
     const file = fileUtils.processFile(result);
     return res.status(200).send(file);
