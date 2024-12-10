@@ -1,7 +1,7 @@
 import fileQueue from './fileQueue';
 
 class QueueUtils {
-  onImageAddition(userId, fileId) {
+  onImageAddition(fileId, userId) {
     fileQueue.add({ fileId: fileId.toString(),
     userId: userId.toString(), });
   }

@@ -14,16 +14,17 @@ fileQueue.process(async (job, done) => {
   }
   const file = await fileUtils.getFileFromIdAndUserId(fileId, userId);
   if (!file) {
-    done(new Error('File not found'));
+    return done(new Error('File not found'));
   }
   try {
     const sizes = [100, 250, 500];
     sizes.forEach(size => {
-      imageThumbnail(file.localPath, {'width': 100}).then((result) => {
-        const filePath = `${file.filePath}_${size}`;
-        fs.writeFileSync(filePath, result);
+      imageThumbnail(file.localPath, {'width': size}).then((result) => {
+        const filePath = `${file.localPath}_${size}`;
+        fs.writeFile(filePath, result, ()=>{});
       });
     });
+    return done();
   } catch (e) {}
 
 });
