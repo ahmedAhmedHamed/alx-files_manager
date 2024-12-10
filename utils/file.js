@@ -15,8 +15,11 @@ class FileUtils {
   }
 
   addFile(userId, name, parentId, isPublic, localPath, type) {
+    if (parentId !== 0) {
+      parentId = ObjectId(parentId);
+    }
     return db.filesCollection.insertOne({ userId: ObjectId(userId), name,
-      parentId: ObjectId(parentId), isPublic,
+      parentId, isPublic,
     type, localPath });
   }
 
@@ -77,13 +80,17 @@ class FileUtils {
   }
 
   formatFile(file) {
+    let parentId = file.parentId;
+    if (parentId !== 0) {
+      parentId = parentId.toString();
+    }
     return {
       id: file._id.toString(),
       userId: file.userId.toString(),
       name: file.name,
       type: file.type,
       isPublic: file.isPublic,
-      parentId: file.parentId.toString(),
+      parentId,
     };
   }
 
