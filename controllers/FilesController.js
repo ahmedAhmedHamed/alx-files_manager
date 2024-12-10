@@ -22,7 +22,7 @@ async function setIsPublicFile(req, res, pub) {
   }
   let file = false;
   try {
-    const filter = { _id: ObjectId(fileId) }; // Condition to find the document
+    const filter = { _id: ObjectId(fileId), userId: user._id }; // Condition to find the document
     const update = { $set: { isPublic: pub } }; // Update operation
     file = await fileUtils.findAndUpdateOne(filter, update);
   } catch (e) {
@@ -123,4 +123,7 @@ module.exports = (app) => {
   app.put('/files/:id/publish', async (req, res) => setIsPublicFile(req, res, true));
 
   app.put('/files/:id/unpublish', async (req, res) => setIsPublicFile(req, res, false));
+  // app.get('/files/:id/data', async (req, res) => {
+  //
+  // });
 };
