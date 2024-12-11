@@ -126,8 +126,7 @@ module.exports = (app) => {
 
   app.put('/files/:id/unpublish', async (req, res) => setIsPublicFile(req, res, false));
   app.get('/files/:id/data', async (req, res) => {
-    const fileId = req.params.id;
-    const size = req.params.size;
+    const { id: fileId, size } = req.params;
     const { userId } = await queries.getUserIdAndKey(req);
     const file = await fileUtils.getFileFromId(fileId);
     if (!file) {
