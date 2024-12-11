@@ -1,6 +1,6 @@
 import db from '../utils/db';
 import queries from '../utils/queries';
-import queueUtils from '../utils/queueUtils'
+import queueUtils from '../utils/queueUtils';
 
 module.exports = (app) => {
   app.post('/users', async (req, res) => {
